@@ -76,7 +76,7 @@ class Board extends React.Component {
     var indices = range(row*n_cols, (row+1)*n_cols);
 
     return (
-      <div className="board-row">
+      <div className="board-row" style={"width: "+(n_cols*11)+"px"}>
         {indices.map(this.renderSquare)}
       </div>
     )
@@ -124,7 +124,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      n_rows: 64,
+      n_rows: 32,
       n_cols: 64,
       colour: "#ffffff",
       history: [{
