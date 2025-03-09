@@ -23,16 +23,18 @@ THEN REPLACE THE STRING BELOW WITH THE ARGUMENTS YOU HAVE TO SUPPLY TO RUN THE D
 
 
 #Pi 0 with 64x64 matrix and adafruit hat
-rpi_rgb_args = "--led-cols=64 --led-rows=64 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=0"
+#rpi_rgb_args = "--led-cols=64 --led-rows=64 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=0"
 
 #pi 0 with 32x64 matrix and adafruit hat
-rpi_rgb_args = "--led-cols=64 --led-rows=32 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=0"
+#rpi_rgb_args = "--led-cols=64 --led-rows=32 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=0"
+
+rpi_rgb_args = "--led-cols=64 --led-rows=32 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=1"
 
 # this line is for my 32x64 matrix using adafruit-hat running on a pi 4 or a pi 3A
 #rpi_rgb_args = "--led-cols=64 --led-rows=32 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=4"
 
 # this line is for my 64x64 matrix using adafruit-hat running on a pi 4 or a pi 3A
-rpi_rgb_args = "--led-cols=64 --led-rows=64 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=4"
+#rpi_rgb_args = "--led-cols=64 --led-rows=64 --led-gpio-mapping=adafruit-hat --led-slowdown-gpio=4"
 
 child = pexpect.spawn("paint/paint " + rpi_rgb_args)
 
@@ -55,9 +57,24 @@ def colour_pixel(request):
     
     return JsonResponse({"message": "Pixel changed."}, status=201)
 
+@csrf_exempt
+def text(request):
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({"message": "Unable to parse JSON: "+str(e)}, status=400)
+    size = data.get("size")
+    if not size:
+       size = 8
+    message = data.get("message")
+    if not message:
+        return JsonResponse({"message": "No message provided"}, status=400)
+
+    child.sendline("msg" + ',' + str(size) + ',' + message)
+
+    return JsonResponse({"message": "Message changed."}, status=201)
 
 @csrf_exempt
 def clear(request):
     child.sendline('clear')
     return JsonResponse({"message": "Cleared"}, status=201)
-            
